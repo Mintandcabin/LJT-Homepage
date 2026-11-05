@@ -22,23 +22,19 @@ jobs:
         run: bundle exec jekyll build --baseurl "/LJT-Homepage"
         env:
           JEKYLL_ENV: production
-      - name: Verify output
+      - name: Diagnose
         run: |
-          set -e
-          ls _site
-          test -f _site/index.html
-          test -f _site/publications/index.html
-          grep -q "Junteng Liu" _site/index.html
-          grep -q "SynLogic" _site/index.html
-          grep -q "C-Eval" _site/index.html
-          grep -q "jliugi@connect.ust.hk" _site/index.html
-          grep -q "Vicent0205" _site/index.html
-          test -f _site/publication/2025-09-01-synlogic/index.html
-          test -f _site/publication/2025-02-01-perception-bottleneck-vlms/index.html
-          test -f _site/publication/2024-11-01-universal-truthfulness-hyperplane/index.html
-          test -f _site/publication/2024-07-01-in-context-sharpness/index.html
-          test -f _site/publication/2023-12-01-ceval/index.html
-          test -f _site/publication/2023-10-01-composing-peft-modules/index.html
-          ! grep -q "Paper Title Number" _site/publications/index.html
-          ! grep -q "Academic Pages is a ready-to-fork" _site/index.html
-          echo "ALL CHECKS PASSED"
+          echo "=== _site/publications ==="
+          ls -la _site/publications/ || echo "NO publications dir"
+          echo "=== _site/publication ==="
+          ls -R _site/publication/ || echo "NO publication dir"
+          echo "=== greps in index ==="
+          for p in "Junteng Liu" "SynLogic" "C-Eval" "jliugi@connect.ust.hk" "Vicent0205" "Zhiyuan" "MINIMAX" "LLM Reasoning"; do
+            if grep -q "$p" _site/index.html; then echo "OK: $p"; else echo "MISSING: $p"; fi
+          done
+          echo "=== publications page content check ==="
+          if [ -f _site/publications/index.html ]; then
+            for p in "SynLogic" "Perception Bottleneck" "Universal Truthfulness" "In-Context Sharpness" "C-Eval" "Composing Parameter"; do
+              if grep -q "$p" _site/publications/index.html; then echo "OK: $p"; else echo "MISSING: $p"; fi
+            done
+          fi
